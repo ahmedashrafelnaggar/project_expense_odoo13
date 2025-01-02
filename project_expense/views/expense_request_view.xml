@@ -1,0 +1,131 @@
+<odoo>
+    <data>
+        <!-- Tree View for Project Expense Request -->
+        <record id="view_project_expense_request_tree" model="ir.ui.view">
+            <field name="name">project.expense.request.tree</field>
+            <field name="model">project.expense.request</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="date"/>
+                    <field name="project_id"/>
+                    <field name="task_count"/>
+                    <field name="total_amount"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_project_expense_request_kanban" model="ir.ui.view">
+            <field name="name">project.expense.request.kanban</field>
+            <field name="model">project.expense.request</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="o_kanban_record">
+                                <strong>
+                                    <field name="name"/>
+                                </strong>
+                                <div>
+                                    <field name="project_id"/>
+                                </div>
+                                <div>
+                                    <field name="total_amount"/>
+                                </div>
+                                <div>
+                                    <field name="state"/>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+
+        <!-- Form View for Project Expense Request -->
+        <record id="view_project_expense_request_form" model="ir.ui.view">
+            <field name="name">project.expense.request.form</field>
+            <field name="model">project.expense.request</field>
+            <field name="arch" type="xml">
+                <form string="Project Expense Request">
+                    <header>
+                        <button string="Open Wizard" type="action"
+                                name="%(project_expense.action_project_expense_report_wizard)d"
+                                context="{'default_property_id': active_id}" class="oe_highlight"
+                        />
+                        <button name="action_draft" string="Set to Draft" type="object" states="cancel"
+                                class="oe_highlight"/>
+                        <button name="action_confirmed" string="Confirmed" type="object" states="draft"
+                                class="oe_highlight"/>
+                        <button name="action_approved" string="Approved" type="object" states="confirmed"
+                                class="oe_highlight"/>
+                        <button name="action_done" string="Done" type="object" states="approved"
+                                class="oe_highlight"/>
+                        <button name="action_cancel" string="Cancel" type="object" states="draft,confirmed,approved"
+                                class="oe_highlight"/>
+                        <field name="state" widget="statusbar" clickable="1"/>
+                    </header>
+
+                    <sheet>
+                        <div name="button_box" class="oe_button_box">
+                            <button name="open_picking" string="Picking" icon="fa-truck" type="object">
+
+                            </button>
+                        </div>
+                        <group>
+                            <field name="name" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"/>
+                            <field name="date" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"/>
+                            <field name="project_id" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"/>
+                            <field name="expense_amount" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"/>
+                            <field name="total_amount" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"/>
+                            <field name="task_count" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"/>
+                            <field name="project_manager" readonly="1"/>
+                            <field name="expense_type_id" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"/>
+                            <field name="limit" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"/>
+                            <field name="picking_id" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"/>
+                            <field name="expense_type_ids" widget="many2many_tags"
+                                   attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"/>
+                            <field name="amount" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"/>
+                            <field name="currency_id" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"
+                                   invisible="1"/>
+                        </group>
+                        <notebook>
+                            <page string="Expense Request">
+                                <field name="expense_line_ids" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}">
+                                    <tree editable="bottom">
+                                        <field name="expense_request_id"/>
+                                        <field name="amount"/>
+                                        <field name="limit"/>
+                                        <field name="currency_id" invisible="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <!-- Action for Project Expense Request -->
+        <record id="action_project_expense_request" model="ir.actions.act_window">
+            <field name="name">Project Expense Requests</field>
+            <field name="res_model">project.expense.request</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="view_id" ref="view_project_expense_request_kanban"/> <!-- Explicitly set the default Kanban view -->
+            <field name="context">{'group_by': 'project_id'}</field> <!-- Enable grouping by project -->
+
+        </record>
+
+        <!-- Menu for Project Expense Request -->
+        <menuitem id="menu_project_expense_request"
+                  name="Expense Request"
+                  parent="project.menu_main_pm"
+                  action="action_project_expense_request"
+                  groups="expense_manager_group"
+        />
+
+
+    </data>
+</odoo>
